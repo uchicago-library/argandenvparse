@@ -49,7 +49,7 @@ def parse_args_and_env(self, env_prefix, args=None, namespace=None,
                 else:
                     if not enable_positional:
                         self.error(
-                            "Can't consume positinal arguments from " +
+                            "Can't consume positional arguments from " +
                             "the enviromation: {}".format(envarg)
                         )
                 env_arg_list.append(env_args[envarg])

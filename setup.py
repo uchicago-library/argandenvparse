@@ -8,7 +8,8 @@ def readme():
 
 setup(
     name="argandenvparse",
-    description="A patch for argparse which gives the ArgumentParser class the ability to parse environmental variables as well",
+    description="A patch for argparse which gives the ArgumentParser class " +
+    "the ability to parse environmental variables as well",
     version="0.0.1",
     long_description=readme(),
     author="Brian Balsamo",

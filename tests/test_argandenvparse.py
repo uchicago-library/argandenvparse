@@ -58,6 +58,53 @@ class Tests(unittest.TestCase):
         self.assertEqual(args.foo, 'bar')
         self.assertEqual(args.monty, 'python')
 
+    def testUnrecognized(self):
+        class TestError(Exception):
+            def __init__(self, message):
+                self.message = message
+
+        def error(message):
+            raise TestError(message)
+
+        environ['TEST_FOO'] = 'bar'
+        parser = argandenvparse.ArgumentParser()
+        parser.error = error
+        # We have to catch the exception here and use
+        # isinstance because of some weirdness with
+        # hot-patching the parser object, I think
+        try:
+            parser.parse_args_and_env('TEST_')
+        except Exception as e:
+            self.assertTrue(
+                isinstance(e, TestError)
+            )
+            self.assertTrue(
+                e.message.startswith("Unrecognized")
+            )
+
+    def testNoPositional(self):
+        class TestError(Exception):
+            def __init__(self, message):
+                self.message = message
+
+        def error(message):
+            raise TestError(message)
+
+        environ['TEST_FOO'] = 'bar'
+        parser = argandenvparse.ArgumentParser()
+        parser.error = error
+        parser.add_argument('foo')
+        try:
+            parser.parse_args_and_env('TEST_', enable_positional=False)
+        except Exception as e:
+            self.assertTrue(
+                isinstance(e, TestError)
+            )
+            print(e.message)
+            self.assertTrue(
+                e.message.startswith("Can't consume positional")
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
