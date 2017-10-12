@@ -6,7 +6,9 @@ v0.0.1
 
 A patch for argparse which gives the ArgumentParser class the ability to parse environmental variables as well
 
-If an environmental variable in all caps beginning with a given prefix is found, the environmental variable name after the prefix (in all lowercase) is used as the key, and the value of the environmental variable as the value for the resulting args Namespace.
+If an environmental variable in all caps beginning with a given prefix is found, the environmental variable name after the prefix (in all lowercase) is used as the key, and the value of the environmental variable as the value for the resulting args Namespace, assuming you have added an argument with either a ```dest``` or an option string that matches the content of the environmental variable after the prefix.
+
+(For a demonstration of this functionality see the code snippet below.)
 
 This is implemented in a new method: ```ArgumentParser.parse_args_and_env()```
 
