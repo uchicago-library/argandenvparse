@@ -12,7 +12,14 @@ class Tests(unittest.TestCase):
     def tearDown(self):
         # Perform any tear down that should
         # occur after every test
-        pass
+        try:
+            del environ['TEST_FOO']
+        except:
+            pass
+        try:
+            del environ['TEST_THIS']
+        except:
+            pass
 
     def testPass(self):
         self.assertEqual(True, True)
@@ -69,17 +76,10 @@ class Tests(unittest.TestCase):
         environ['TEST_FOO'] = 'bar'
         parser = argandenvparse.ArgumentParser()
         parser.error = error
-        # We have to catch the exception here and use
-        # isinstance because of some weirdness with
-        # hot-patching the parser object, I think
-        try:
+        with self.assertRaises(TestError) as cm:
             parser.parse_args_and_env('TEST_')
-        except Exception as e:
             self.assertTrue(
-                isinstance(e, TestError)
-            )
-            self.assertTrue(
-                e.message.startswith("Unrecognized")
+                cm.exception.message.startswith("Unrecognized")
             )
 
     def testNoPositional(self):
@@ -94,16 +94,21 @@ class Tests(unittest.TestCase):
         parser = argandenvparse.ArgumentParser()
         parser.error = error
         parser.add_argument('foo')
-        try:
+        with self.assertRaises(TestError) as cm:
             parser.parse_args_and_env('TEST_', enable_positional=False)
-        except Exception as e:
             self.assertTrue(
-                isinstance(e, TestError)
+                cm.exception.message.startswith("Can't consume positional")
             )
-            print(e.message)
-            self.assertTrue(
-                e.message.startswith("Can't consume positional")
-            )
+
+    def testNoErrorOnUnrecognizedEnvVar(self):
+        environ['TEST_FOO'] = 'bar'
+        environ['TEST_THIS'] = 'that'
+        parser = argandenvparse.ArgumentParser()
+        parser.add_argument("--foo")
+        args = parser.parse_args_and_env('TEST_', error_on_unrecognized_env_vars=False)
+        self.assertEqual(args.foo, 'bar')
+        with self.assertRaises(AttributeError):
+            args.this
 
 
 if __name__ == "__main__":

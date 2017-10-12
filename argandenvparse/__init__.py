@@ -12,7 +12,8 @@ from argparse import *
 
 
 def parse_args_and_env(self, env_prefix, args=None, namespace=None,
-                       enable_positional=True):
+                       enable_positional=True,
+                       error_on_unrecognized_env_vars=True):
 
     env_args = {}
     for x in environ:
@@ -53,7 +54,7 @@ def parse_args_and_env(self, env_prefix, args=None, namespace=None,
                             "the enviromation: {}".format(envarg)
                         )
                 env_arg_list.append(env_args[envarg])
-        if not found_in_parser:
+        if (not found_in_parser) and error_on_unrecognized_env_vars:
             self.error(
                 "Unrecognized environmental argument: {}".format(
                     envarg
